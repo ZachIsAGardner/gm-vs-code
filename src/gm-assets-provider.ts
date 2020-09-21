@@ -131,7 +131,7 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
             arguments: [`${Utilities.rootPath()}${element.item.yy.creationCodeFile.split("/").slice(1,-1).join("/")}/${fileName}`]
         }
 
-        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, element.resourceType, command));
+        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, "GMScript", command));
 
         return result;
     }
