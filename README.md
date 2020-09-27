@@ -8,6 +8,8 @@ If you want to create files you'll still have to do that in GameMaker, this is m
 
 ## Setup
 
+You can either install this extension through the .vsix file in this repo, or you can find it in the extensions marketplace.
+
 Once the extension is installed as long as your current directory, or any of it's children, contain a .yyp file it should just work. You will see a tab on the left with the GameMaker logo. That's where you can view and edit GameMaker related code files.
 
 ## Thanks
