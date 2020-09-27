@@ -17,6 +17,8 @@ export class Utilities {
             : null;  
 
         var findPath = function(path: string) {
+            if (!path) return null;
+
             if (path.includes(".yyp")) {
                 return path;
             }
@@ -43,6 +45,7 @@ export class Utilities {
             return foundPath;
         }
         else {
+            vscode.window.showErrorMessage("Couldn't find a .yyp file in the current directory or in any of it's children.");
             return "";
         }
     }

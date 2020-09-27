@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GmAsset = exports.GmAssetsProvider = void 0;
 const vscode = require("vscode");
+const path = require("path");
 const utilities_1 = require("./utilities");
 class GmAssetsProvider {
     constructor() {
@@ -19,6 +20,8 @@ class GmAssetsProvider {
         return element;
     }
     getChildren(element) {
+        if (!this.project || !this.resources)
+            return [];
         // Root
         if (!element) {
             return this.getRootChildren();
@@ -52,7 +55,7 @@ class GmAssetsProvider {
                 result.push(el);
             }
         });
-        return result;
+        return this.sorted(result);
     }
     getFolderChildren(element) {
         var result = new Array();
@@ -70,16 +73,24 @@ class GmAssetsProvider {
                 result.push(new GmAsset(`${r.yy.name}.gml`, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType, command));
             }
             else if (r.yy.resourceType == "GMObject") {
-                result.push(new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType));
+                var object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType);
+                var children = this.getObjectChildren(object);
+                if (children.length <= 0)
+                    object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType);
+                result.push(object);
             }
             else if (r.yy.resourceType == "GMRoom") {
-                result.push(new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType));
+                var object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType);
+                var children = this.getRoomChildren(object);
+                if (children.length <= 0)
+                    object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType);
+                result.push(object);
             }
             else if (r.yy.resourceType == "GMShader") {
                 result.push(new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType));
             }
         });
-        return result;
+        return this.sorted(result);
     }
     getObjectChildren(element) {
         var result = new Array();
@@ -92,7 +103,7 @@ class GmAssetsProvider {
             };
             result.push(new GmAsset(event.name, vscode.TreeItemCollapsibleState.None, e, e.resourceType, command));
         });
-        return result;
+        return this.sorted(result);
     }
     getRoomChildren(element) {
         var result = new Array();
@@ -105,7 +116,7 @@ class GmAssetsProvider {
             arguments: [`${utilities_1.Utilities.rootPath()}${element.item.yy.creationCodeFile.split("/").slice(1, -1).join("/")}/${fileName}`]
         };
         result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, "GMScript", command));
-        return result;
+        return this.sorted(result);
     }
     getShaderChildren(element) {
         var result = new Array();
@@ -121,7 +132,7 @@ class GmAssetsProvider {
         };
         addGmAsset("fsh");
         addGmAsset("vsh");
-        return result;
+        return this.sorted(result);
     }
     containsGml(element) {
         if (element.resourceType == "GMScript" || element.resourceType == "GMEvent" || element.resourceType == "GMRoom" || element.resourceType == "GMShader") {
@@ -139,6 +150,9 @@ class GmAssetsProvider {
         }
         return false;
     }
+    sorted(arr) {
+        return arr.sort((o1, o2) => (o2.label > o1.label) ? -1 : 1);
+    }
 }
 exports.GmAssetsProvider = GmAssetsProvider;
 class GmAsset extends vscode.TreeItem {
@@ -153,19 +167,69 @@ class GmAsset extends vscode.TreeItem {
         this.contextValue = 'gmAsset';
         switch (resourceType) {
             case "GMFolder": {
-                this.iconPath = vscode.ThemeIcon.Folder;
+                this.iconPath = {
+                    light: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
+                    dark: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
+                };
                 break;
             }
             case "GMObject": {
-                this.iconPath = vscode.ThemeIcon.Folder;
+                if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'ghost.svg'),
+                        dark: path.join(__filename, '..', '..', 'images', 'ghost.svg'),
+                    };
+                }
+                else {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'ghost-f.svg'),
+                        dark: path.join(__filename, '..', '..', 'images', 'ghost-f.svg'),
+                    };
+                }
                 break;
             }
             case "GMRoom": {
-                this.iconPath = vscode.ThemeIcon.Folder;
+                if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'grid.svg'),
+                        dark: path.join(__filename, '..', '..', 'images', 'grid.svg'),
+                    };
+                }
+                else {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'grid-f.svg'),
+                        dark: path.join(__filename, '..', '..', 'images', 'grid-f.svg'),
+                    };
+                }
+                break;
+            }
+            case "GMShader": {
+                if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                        dark: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                    };
+                }
+                else {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
+                        dark: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
+                    };
+                }
                 break;
             }
             case "GMScript": {
-                this.iconPath = vscode.ThemeIcon.File;
+                this.iconPath = {
+                    light: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                    dark: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                };
+                break;
+            }
+            case "GMEvent": {
+                this.iconPath = {
+                    light: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                    dark: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                };
                 break;
             }
             default: {

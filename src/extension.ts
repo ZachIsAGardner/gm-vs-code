@@ -9,8 +9,10 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Activate GM Extension.');
 
 	const gmAssetsProvider = new GmAssetsProvider();
-	vscode.window.registerTreeDataProvider('gmAssetBrowser', gmAssetsProvider);
+
+	const view = vscode.window.createTreeView('gmAssetBrowser', { treeDataProvider: gmAssetsProvider, showCollapseAll: true });
 	vscode.commands.registerCommand('gmAssetBrowser.refresh', () => gmAssetsProvider.refresh());
+
 	vscode.commands.registerCommand(
 		'extension.openFile', 
 		async (path) => {
@@ -18,6 +20,8 @@ export function activate(context: vscode.ExtensionContext) {
         	vscode.window.showTextDocument(document);
 		}
 	);
+
+	// vscode.languages.registerDocumentSemanticTokensProvider(selector, provider, language);
 }
 
 // this method is called when your extension is deactivated

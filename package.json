@@ -28,7 +28,11 @@
 		"commands": [
 			{
 				"command": "gmAssetBrowser.refresh",
-				"title": "Refresh"
+				"title": "Refresh",
+				"icon": {
+					"light": "images/refresh.svg",
+					"dark": "images/refresh.svg"
+				}
 			}
 		],
 		"menus": {

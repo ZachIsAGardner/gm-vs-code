@@ -13,6 +13,8 @@ class Utilities {
             ? vscode.workspace.workspaceFolders[0].uri.path.slice(1)
             : null;
         var findPath = function (path) {
+            if (!path)
+                return null;
             if (path.includes(".yyp")) {
                 return path;
             }
@@ -34,6 +36,7 @@ class Utilities {
             return foundPath;
         }
         else {
+            vscode.window.showErrorMessage("Couldn't find a .yyp file in the current directory or in any of it's children.");
             return "";
         }
     }
