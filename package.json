@@ -8,6 +8,11 @@
 	"engines": {
 		"vscode": "^1.49.0"
 	},
+	"repository": {
+        "type": "git",
+        "url": "https://github.com/ZachIsAGardner/gm-vs-code"
+    },
+    "homepage": "https://github.com/ZachIsAGardner/gm-vs-code/README.md",
 	"categories": [
 		"Other"
 	],

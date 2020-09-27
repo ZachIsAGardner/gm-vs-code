@@ -205,22 +205,22 @@ export class GmAsset extends vscode.TreeItem {
         switch (resourceType) {
             case "GMFolder": {
                 this.iconPath = { 
-                    light: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
-                    dark: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
+                    light: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
+                    dark: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
                 }
                 break;
             }
             case "GMObject": {
                 if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
                     this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'ghost.svg'),
-                        dark: path.join(__filename, '..', '..', 'images', 'ghost.svg'),
+                        light: path.join(__filename, '..', '..', 'images','icons', 'ghost.png'),
+                        dark: path.join(__filename, '..', '..', 'images','icons', 'ghost.png'),
                     }
                 }
                 else {
                     this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'ghost-f.svg'),
-                        dark: path.join(__filename, '..', '..', 'images', 'ghost-f.svg'),
+                        light: path.join(__filename, '..', '..', 'images', 'icons', 'ghost-f.png'),
+                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'ghost-f.png'),
                     }
                 }
                 break;
@@ -228,14 +228,14 @@ export class GmAsset extends vscode.TreeItem {
             case "GMRoom": {
                 if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
                     this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'grid.svg'),
-                        dark: path.join(__filename, '..', '..', 'images', 'grid.svg'),
+                        light: path.join(__filename, '..', '..', 'images','icons',  'grid.png'),
+                        dark: path.join(__filename, '..', '..', 'images','icons',  'grid.png'),
                     }
                 }
                 else {
                     this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'grid-f.svg'),
-                        dark: path.join(__filename, '..', '..', 'images', 'grid-f.svg'),
+                        light: path.join(__filename, '..', '..', 'images', 'icons', 'grid-f.png'),
+                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'grid-f.png'),
                     }
                 }
                 break;
@@ -243,29 +243,29 @@ export class GmAsset extends vscode.TreeItem {
             case "GMShader": {
                 if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
                     this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
-                        dark: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                        light: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
+                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
                     }
                 }
                 else {
                     this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
-                        dark: path.join(__filename, '..', '..', 'images', 'folder-f.svg'),
+                        light: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
+                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
                     }
                 }
                 break;
             }
             case "GMScript": {
                 this.iconPath = { 
-                    light: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
-                    dark: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                    light: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
+                    dark: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
                 }
                 break;
             }
             case "GMEvent": {
                 this.iconPath = { 
-                    light: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
-                    dark: path.join(__filename, '..', '..', 'images', 'document-f.svg'),
+                    light: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
+                    dark: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
                 }
                 break;
             }
