@@ -61,7 +61,11 @@ class GmAssetsProvider {
         var result = new Array();
         const folderPath = element.item.folderPath.split(".yy")[0];
         this.project.Folders.filter((f) => f.folderPath.split("/").slice(0, -1).join("/") == folderPath).forEach((f) => {
-            result.push(new GmAsset(f.name, vscode.TreeItemCollapsibleState.Collapsed, f, f.resourceType));
+            var folder = new GmAsset(f.name, vscode.TreeItemCollapsibleState.Collapsed, f, f.resourceType);
+            var children = this.getChildren(folder);
+            if (children.length <= 0)
+                folder = new GmAsset(f.name, vscode.TreeItemCollapsibleState.None, f, f.resourceType);
+            result.push(folder);
         });
         this.resources.filter(r => r.yy.parent.path == element.item.folderPath).forEach(r => {
             if (r.yy.resourceType == "GMScript") {
@@ -74,17 +78,17 @@ class GmAssetsProvider {
             }
             else if (r.yy.resourceType == "GMObject") {
                 var object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType);
-                var children = this.getObjectChildren(object);
+                var children = this.getChildren(object);
                 if (children.length <= 0)
                     object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType);
                 result.push(object);
             }
             else if (r.yy.resourceType == "GMRoom") {
-                var object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType);
-                var children = this.getRoomChildren(object);
+                var room = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType);
+                var children = this.getChildren(room);
                 if (children.length <= 0)
-                    object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType);
-                result.push(object);
+                    room = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType);
+                result.push(room);
             }
             else if (r.yy.resourceType == "GMShader") {
                 result.push(new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType));
@@ -151,7 +155,23 @@ class GmAssetsProvider {
         return false;
     }
     sorted(arr) {
-        return arr.sort((o1, o2) => (o2.label > o1.label) ? -1 : 1);
+        return arr.sort((o1, o2) => {
+            // Sort by folder and item.
+            if (o1.resourceType == "GMFolder" && o2.resourceType != "GMFolder") {
+                return -1;
+            }
+            if (o1.resourceType != "GMFolder" && o2.resourceType == "GMFolder") {
+                return 1;
+            }
+            // Sort when both same type.
+            if (o1.label > o2.label) {
+                return 1;
+            }
+            if (o1.label < o2.label) {
+                return -1;
+            }
+            return 0;
+        });
     }
 }
 exports.GmAssetsProvider = GmAssetsProvider;
@@ -167,10 +187,18 @@ class GmAsset extends vscode.TreeItem {
         this.contextValue = 'gmAsset';
         switch (resourceType) {
             case "GMFolder": {
-                this.iconPath = {
-                    light: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
-                    dark: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
-                };
+                if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'icons', 'folder.png'),
+                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'folder.png'),
+                    };
+                }
+                else {
+                    this.iconPath = {
+                        light: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
+                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
+                    };
+                }
                 break;
             }
             case "GMObject": {

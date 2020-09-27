@@ -3,16 +3,16 @@
 	"displayName": "GMS2 Asset Browser in VS Code",
 	"description": "Use the GameMaker Studio 2 Asset Browser in Visual Studio Code for reading and editing code related files.",
 	"publisher": "ZachIsAGardner",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"icon": "images/gm_logo_white.png",
 	"engines": {
 		"vscode": "^1.49.0"
 	},
 	"repository": {
-        "type": "git",
-        "url": "https://github.com/ZachIsAGardner/gm-vs-code"
-    },
-    "homepage": "https://github.com/ZachIsAGardner/gm-vs-code/README.md",
+		"type": "git",
+		"url": "https://github.com/ZachIsAGardner/gm-vs-code"
+	},
+	"homepage": "https://github.com/ZachIsAGardner/gm-vs-code/README.md",
 	"categories": [
 		"Other"
 	],
@@ -35,8 +35,8 @@
 				"command": "gmAssetBrowser.refresh",
 				"title": "Refresh",
 				"icon": {
-					"light": "images/refresh.png",
-					"dark": "images/refresh.png"
+					"light": "images/icons/refresh.png",
+					"dark": "images/icons/refresh.png"
 				}
 			}
 		],
