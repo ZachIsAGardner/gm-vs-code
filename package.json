@@ -1,8 +1,8 @@
 {
 	"name": "gm-vs-code",
-	"displayName": "GMS2 in VS Code",
-	"description": "Do GameMaker Studio 2 stuff in Visual Studio Code.",
-	"publisher": "zachisagardner",
+	"displayName": "GMS2 Asset Browser in VS Code",
+	"description": "Use the GameMaker Studio 2 Asset Browser in Visual Studio Code for reading and editing code related files.",
+	"publisher": "ZachIsAGardner",
 	"version": "0.0.1",
 	"icon": "images/gm_logo_white.png",
 	"engines": {
