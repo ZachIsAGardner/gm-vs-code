@@ -77,7 +77,7 @@ export class Utilities {
 
         var name = `${eventType(event.eventType)}_${event.eventNum}.gml`;
 
-        var path =  `${basePath}${name}`;
+        var path = `${basePath}${name}`;
 
         return {
             name: name,

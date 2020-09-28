@@ -17,6 +17,8 @@
 		"Other"
 	],
 	"activationEvents": [
+		"*",
+		"onCommand:gmAssetBrowser.revealFile",
 		"onView:gmAssetBrowser"
 	],
 	"main": "./out/extension.js",
@@ -38,9 +40,29 @@
 					"light": "images/icons/refresh.png",
 					"dark": "images/icons/refresh.png"
 				}
+			},
+			{
+                "command": "gmAssetBrowser.revealFile",
+                "title": "Reveal file in custom asset browser sidebar",
+                "icon": {
+                    "dark": "images/icons/refresh.png",
+                    "light": "images/icons/refresh.png"
+                }
+            }
+		],
+		"keybindings":[
+			{
+				"command": "gmAssetBrowser.revealFile",
+				"key": "alt+r"
 			}
 		],
 		"menus": {
+			"editor/title": [
+                {
+                    "command": "gmAssetBrowser.revealFile",
+                    "group": "navigation"
+                }
+            ],
 			"view/title": [
 				{
 					"command": "gmAssetBrowser.refresh",

@@ -3,6 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Utilities } from './utilities';
 import { stringify } from 'querystring';
+import { Extension } from './extension';
+import { start } from 'repl';
 
 export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
 
@@ -23,12 +25,63 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
 		this._onDidChangeTreeData.fire();
     }
 
+    reveal(): void {
+        try {
+            if (!vscode.window.activeTextEditor) return;
+    
+            var search = vscode.window.activeTextEditor.document.uri.fsPath.split("\\").join("/");
+    
+            var getElementToReveal = (element: GmAsset, search: string): GmAsset | null => {
+                if (element.path && element.path.includes(search)) {
+                    return element;
+                }
+        
+                var children = this.getChildren(element);
+        
+                if (children.length <= 0) {
+                    return null;
+                }
+        
+                for (let i = 0; i < children.length; i++) {
+                    const child = children[i];
+                    var elementToReveal: GmAsset | null = getElementToReveal(child, search);
+                    if (elementToReveal) return elementToReveal;
+                }
+    
+                return null;
+            }
+    
+            var rootFolders = this.getChildren();
+    
+            var result: any = null;
+    
+            rootFolders.forEach(root => {
+                if (!result) {
+                    var rootResult = getElementToReveal(root, search);
+                    if (rootResult) { 
+                        result = rootResult; 
+                    }
+                };  
+            });
+    
+            if (result) {
+                Extension.view.reveal(result);
+            }
+        }
+        catch(err) {
+            throw err;
+        }
+    }
+
     getTreeItem(element: GmAsset): vscode.TreeItem {
         return element;
     }
 
-    getChildren(element?: GmAsset): Array<GmAsset> {
+    getParent(element: GmAsset): vscode.ProviderResult<GmAsset> {
+        return element.parent;
+    }
 
+    getChildren(element?: GmAsset): Array<GmAsset> {
         if (!this.project || !this.resources) return [];
         
         // Root
@@ -76,9 +129,10 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
         const folderPath = element.item.folderPath.split(".yy")[0];
 
         this.project.Folders.filter((f: any) => f.folderPath.split("/").slice(0, -1).join("/") == folderPath).forEach((f: any) => {
-            var folder = new GmAsset(f.name, vscode.TreeItemCollapsibleState.Collapsed, f, f.resourceType)
+            f.path = `${Utilities.rootPath()}${f.folderPath}`;
+            var folder = new GmAsset(f.name, vscode.TreeItemCollapsibleState.Collapsed, f, f.resourceType, undefined, element);
             var children = this.getChildren(folder);
-            if (children.length <= 0) folder = new GmAsset(f.name, vscode.TreeItemCollapsibleState.None, f, f.resourceType);
+            if (children.length <= 0) folder = new GmAsset(f.name, vscode.TreeItemCollapsibleState.None, f, f.resourceType, undefined, element);
             result.push(folder);
         });
 
@@ -89,22 +143,22 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
                     title: '',
                     arguments: [r.path.replace("yy", "gml")]
                 };
-                result.push(new GmAsset(`${r.yy.name}.gml`, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType, command));
+                result.push(new GmAsset(`${r.yy.name}.gml`, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType, command, element));
             }
             else if (r.yy.resourceType == "GMObject") {
-                var object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType);
+                var object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType, undefined, element);
                 var children = this.getChildren(object);
-                if (children.length <= 0) object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType);
+                if (children.length <= 0) object = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType), undefined, element;
                 result.push(object);
             }
             else if (r.yy.resourceType == "GMRoom") {
-                var room = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType);
+                var room = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType, undefined, element);
                 var children = this.getChildren(room);
-                if (children.length <= 0) room = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType);
+                if (children.length <= 0) room = new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.None, r, r.yy.resourceType, undefined, element);
                 result.push(room);
             }
             else if (r.yy.resourceType == "GMShader") {
-                result.push(new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType));
+                result.push(new GmAsset(r.yy.name, vscode.TreeItemCollapsibleState.Collapsed, r, r.yy.resourceType, undefined, element));
             }
         });
 
@@ -123,7 +177,9 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
                 arguments: [event.path]
             }
 
-            result.push(new GmAsset(event.name, vscode.TreeItemCollapsibleState.None, e, e.resourceType, command));
+            e.path = event.path;
+
+            result.push(new GmAsset(event.name, vscode.TreeItemCollapsibleState.None, e, e.resourceType, command, element));
         });
 
         return this.sorted(result);
@@ -142,7 +198,7 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
             arguments: [`${Utilities.rootPath()}${element.item.yy.creationCodeFile.split("/").slice(1,-1).join("/")}/${fileName}`]
         }
 
-        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, "GMScript", command));
+        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, "GMScript", command, element));
 
         return this.sorted(result);
     }
@@ -159,7 +215,7 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
                 arguments: [filePath]
             };
     
-            result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, element.resourceType, command));
+            result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, { path: filePath }, "GMShaderFile", command, element));
         }
 
         addGmAsset("fsh");
@@ -169,7 +225,7 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
     }
 
     containsGml(element: GmAsset): boolean {
-        if (element.resourceType == "GMScript" || element.resourceType == "GMEvent" || element.resourceType == "GMRoom" || element.resourceType == "GMShader") {
+        if (element.resourceType == "GMScript" || element.resourceType == "GMEvent" || element.resourceType == "GMRoom" || element.resourceType == "GMShader" || element.resourceType == "GMShaderFile") {
             return true;
         }
 
@@ -218,14 +274,19 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
 
 export class GmAsset extends vscode.TreeItem {
 
+    public path: string | undefined = undefined;
+
     constructor(
         public readonly label: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
         public readonly item: any,
         public readonly resourceType: string,
         public readonly command?: vscode.Command,
+        public readonly parent?: GmAsset | undefined
     ) {
         super(label, collapsibleState);
+
+        this.path = item.path;
 
         switch (resourceType) {
             case "GMFolder": {
@@ -274,18 +335,19 @@ export class GmAsset extends vscode.TreeItem {
                 break;
             }
             case "GMShader": {
-                if (collapsibleState == vscode.TreeItemCollapsibleState.None) {
-                    this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
-                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
-                    }
+                this.iconPath = { 
+                    light: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
+                    dark: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
                 }
-                else {
-                    this.iconPath = { 
-                        light: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
-                        dark: path.join(__filename, '..', '..', 'images', 'icons', 'folder-f.png'),
-                    }
+                
+                break;
+            }
+            case "GMShaderFile": {
+                this.iconPath = { 
+                    light: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
+                    dark: path.join(__filename, '..', '..', 'images', 'icons', 'document-f.png'),
                 }
+                
                 break;
             }
             case "GMScript": {

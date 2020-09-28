@@ -9,18 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = void 0;
+exports.deactivate = exports.activate = exports.Extension = void 0;
 const vscode = require("vscode");
 const gm_assets_provider_1 = require("./gm-assets-provider");
+class Extension {
+}
+exports.Extension = Extension;
 function activate(context) {
     console.log('Activate GM Extension.');
     const gmAssetsProvider = new gm_assets_provider_1.GmAssetsProvider();
-    const view = vscode.window.createTreeView('gmAssetBrowser', { treeDataProvider: gmAssetsProvider, showCollapseAll: true });
+    Extension.view = vscode.window.createTreeView('gmAssetBrowser', { treeDataProvider: gmAssetsProvider, showCollapseAll: true });
     vscode.commands.registerCommand('gmAssetBrowser.refresh', () => gmAssetsProvider.refresh());
     vscode.commands.registerCommand('extension.openFile', (path) => __awaiter(this, void 0, void 0, function* () {
         let document = yield vscode.workspace.openTextDocument(path);
         vscode.window.showTextDocument(document);
     }));
+    var reveal = vscode.commands.registerCommand("gmAssetBrowser.revealFile", () => gmAssetsProvider.reveal());
+    context.subscriptions.push(reveal);
     // vscode.languages.registerDocumentSemanticTokensProvider(selector, provider, language);
 }
 exports.activate = activate;
