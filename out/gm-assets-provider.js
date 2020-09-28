@@ -23,7 +23,7 @@ class GmAssetsProvider {
                 return;
             var search = vscode.window.activeTextEditor.document.uri.fsPath.split("\\").join("/");
             var getElementToReveal = (element, search) => {
-                if (element.path && element.path.includes(search)) {
+                if (element.path && (element.path.includes(search) || element.path.replace(".yy", ".gml").includes(search))) {
                     return element;
                 }
                 var children = this.getChildren(element);
@@ -160,12 +160,13 @@ class GmAssetsProvider {
         const fileName = element.item.yy.creationCodeFile.split("/").slice(-1)[0];
         if (!fileName)
             return [];
+        var filePath = `${utilities_1.Utilities.rootPath()}${element.item.yy.creationCodeFile.split("/").slice(1, -1).join("/")}/${fileName}`;
         var command = {
             command: 'extension.openFile',
             title: '',
-            arguments: [`${utilities_1.Utilities.rootPath()}${element.item.yy.creationCodeFile.split("/").slice(1, -1).join("/")}/${fileName}`]
+            arguments: [filePath]
         };
-        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, "GMScript", command, element));
+        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, { path: filePath }, "GMScript", command, element));
         return this.sorted(result);
     }
     getShaderChildren(element) {

@@ -32,7 +32,7 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
             var search = vscode.window.activeTextEditor.document.uri.fsPath.split("\\").join("/");
     
             var getElementToReveal = (element: GmAsset, search: string): GmAsset | null => {
-                if (element.path && element.path.includes(search)) {
+                if (element.path && (element.path.includes(search) || element.path.replace(".yy", ".gml").includes(search))) {
                     return element;
                 }
         
@@ -192,13 +192,15 @@ export class GmAssetsProvider implements vscode.TreeDataProvider<GmAsset> {
 
         if (!fileName) return [];
 
+        var filePath = `${Utilities.rootPath()}${element.item.yy.creationCodeFile.split("/").slice(1,-1).join("/")}/${fileName}`;
+
         var command: any = {
             command: 'extension.openFile',
             title: '',
-            arguments: [`${Utilities.rootPath()}${element.item.yy.creationCodeFile.split("/").slice(1,-1).join("/")}/${fileName}`]
+            arguments: [filePath]
         }
 
-        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, element, "GMScript", command, element));
+        result.push(new GmAsset(fileName, vscode.TreeItemCollapsibleState.None, { path: filePath }, "GMScript", command, element));
 
         return this.sorted(result);
     }
